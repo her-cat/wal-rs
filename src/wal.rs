@@ -109,11 +109,11 @@ impl WAL {
     }
 
     pub fn read(&self, pos: &ChunkPosition) -> Result<BytesMut> {
-        let mut wal = self.inner.write().unwrap();
+        let wal = self.inner.read().unwrap();
 
         let segment = match pos.segment_id == wal.active_segment.id {
-            true => Some(&mut wal.active_segment),
-            false => wal.older_segments.get_mut(&pos.segment_id),
+            true => Some(&wal.active_segment),
+            false => wal.older_segments.get(&pos.segment_id),
         };
 
         if let Some(seg) = segment {
